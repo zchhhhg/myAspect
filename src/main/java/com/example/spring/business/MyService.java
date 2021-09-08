@@ -1,8 +1,16 @@
 package com.example.spring.business;
 
+import com.example.spring.event.EventPublisher;
+import com.example.spring.util.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Cheng
@@ -16,6 +24,9 @@ public class MyService implements IService {
      */
     private static Logger logger = LoggerFactory.getLogger(MyService.class);
 
+    @Autowired
+    private EventPublisher eventPublisher;
+
     @Override
     public void getCache() {
         String result = getCacheResult();
@@ -27,5 +38,13 @@ public class MyService implements IService {
 
     public String getCacheResult(){
         return "cache result";
+    }
+
+    @Override
+    public void publishEvent(){
+        Map<String,Object> param = new HashMap<>();
+        param.put("message", "233333");
+        eventPublisher.publish(param, "001");
+        logger.info("我在事件发布之后");
     }
 }

@@ -27,4 +27,9 @@ public class MyController {
         service.getCache();
         return "success";
     }
+
+    @RequestMapping(path = "/event")
+    public void publishEvent(){
+        service.publishEvent();
+    }
 }

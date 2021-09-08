@@ -6,4 +6,5 @@ package com.example.spring.business;
  */
 public interface IService {
     void getCache();
+    void publishEvent();
 }
