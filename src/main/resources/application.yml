@@ -13,3 +13,7 @@ server:
     aop:
       proxy-target-class: true
       auto: true
+scheduled:
+#  cron: 0/5 * * * * ?
+# Spring Boot 2.1 以上可以通过将corn配置为-关闭自动任务
+  cron: "-"

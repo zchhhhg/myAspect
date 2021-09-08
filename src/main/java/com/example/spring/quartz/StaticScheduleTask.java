@@ -14,7 +14,7 @@ import java.util.Date;
 @Configuration
 @EnableScheduling
 public class StaticScheduleTask {
-    @Scheduled(cron = "0/2 * *  * * ?")
+    @Scheduled(cron = "${scheduled.cron}")
     public void executeScheduleTask() {
         System.out.println("执行静态定时任务时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
     }
