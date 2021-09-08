@@ -3,6 +3,7 @@ package com.example.spring.aspect;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
+ * CacheRedis自定义redis缓存切面注解，但可以切入controller却无法切入service
  * @author Cheng
  * @date 2021-08-30-9:27
  */
