@@ -2,6 +2,8 @@ package com.example.spring.business;
 
 import com.example.spring.aspect.CacheRedis;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,5 +33,10 @@ public class MyController {
     @RequestMapping(path = "/event")
     public void publishEvent(){
         service.publishEvent();
+    }
+
+    @GetMapping(path = "/generateScript/{MENU_ID}")
+    public void publishEvent(@PathVariable("MENU_ID") String MENU_ID) throws Exception {
+        service.generateSqlScript(MENU_ID);
     }
 }

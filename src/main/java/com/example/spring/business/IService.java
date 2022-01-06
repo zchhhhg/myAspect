@@ -7,4 +7,5 @@ package com.example.spring.business;
 public interface IService {
     void getCache();
     void publishEvent();
+    void generateSqlScript(String MENU_ID) throws Exception;
 }

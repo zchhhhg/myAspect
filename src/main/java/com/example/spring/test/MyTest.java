@@ -1,99 +1,74 @@
-package com.example.spring.business;
+package com.example.spring.test;
 
-import com.example.spring.event.EventPublisher;
 import com.example.spring.util.CommonUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.swing.filechooser.FileSystemView;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Cheng
- * @date 2021-09-08-10:32
+ * @date 2021-10-14-9:25
  */
-@Service
-public class MyService implements IService {
-
-    /**
-     * define a global Logger object
-     */
-    private static Logger logger = LoggerFactory.getLogger(MyService.class);
-
-    @Autowired
-    private EventPublisher eventPublisher;
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MyTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     /**
+     * 菜单ID
+     */
+    private String MENU_ID = "20000015";
+
+    /**
      * 由BUSI_CODE关联的配置表，置于字符串数组中方便批量操作
      */
-    private static String[] tables = {"OPP_BUSI_DEF","OPP_BUSI_ACS_CFG","OPP_PROC_POST_CFG","OPP_BUSI_REVIEW_NODE"};
+    private static String[] tables = {"OPP_BUSI_DEF", "OPP_BUSI_ACS_CFG", "OPP_PROC_POST_CFG", "OPP_BUSI_REVIEW_NODE"};
 
-    @Override
-    public void getCache() {
-        String result = getCacheResult();
-        logger.debug(result);
-        logger.info("测算项目【{}】明细中部门经济分类【{}】的测算金额【{}】元","我的项目","0503-公用经费","123");
-        logger.warn(result);
-        logger.error(result);
-    }
 
-    public String getCacheResult(){
-        return "cache result";
-    }
-
-    @Override
-    public void publishEvent(){
-        Map<String,Object> param = new HashMap<>();
-        param.put("message", "233333");
-        eventPublisher.publish(param, "001");
-        logger.info("我在事件发布之后");
-    }
-    @Override
-    public void generateSqlScript(String MENU_ID) throws Exception {
-        Map<String, Object> menuInfo = jdbcTemplate.queryForMap("SELECT * FROM UPM_MENU WHERE MENU_ID="+MENU_ID);
-        if(CommonUtil.isNullOrEmpty(menuInfo)){
+    @Test
+    public void generateSqlScript() throws Exception {
+        Map<String, Object> menuInfo = jdbcTemplate.queryForMap("SELECT * FROM UPM_MENU WHERE MENU_ID=" + MENU_ID);
+        if (CommonUtil.isNullOrEmpty(menuInfo)) {
             throw new Exception("菜单信息不存在!!!");
         }
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(generateScript("UPM_MENU", MENU_ID, null, null));
-        if(CommonUtil.isNotNullOrEmpty(menuInfo.get("BUSI_CODE"))){
+        stringBuilder.append(generateScript("UPM_MENU", null, null));
+        if (CommonUtil.isNotNullOrEmpty(menuInfo.get("BUSI_CODE"))) {
             String BUSI_CODE = CommonUtil.nonNullStr(menuInfo.get("BUSI_CODE"));
-            List<Map<String, Object>> checkList = jdbcTemplate.queryForList("SELECT * FROM OPP_BUSI_ACS_CFG WHERE BUSI_CODE='"+BUSI_CODE+"'");
-            if(CommonUtil.isNotNullOrEmpty(checkList)){
-                checkList.forEach(e->{
+            List<Map<String, Object>> checkList = jdbcTemplate.queryForList("SELECT * FROM OPP_BUSI_ACS_CFG WHERE BUSI_CODE='" + BUSI_CODE + "'");
+            if (CommonUtil.isNotNullOrEmpty(checkList)) {
+                checkList.forEach(e -> {
                     String CON_ID = CommonUtil.nonNullStr(e.get("CON_ID"));
                     try {
-                        stringBuilder.append(generateScript("OPP_BUSI_ACS_COND", MENU_ID,null,CON_ID));
+                        stringBuilder.append(generateScript("OPP_BUSI_ACS_COND", null, CON_ID));
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
                 });
             }
-            for(int j = 0; j< tables.length; j++) {
+            for (int j = 0; j < tables.length; j++) {
                 String tableName = tables[j];
-                stringBuilder.append(generateScript(tableName, MENU_ID, BUSI_CODE, null));
+                stringBuilder.append(generateScript(tableName, BUSI_CODE, null));
             }
         }
         System.out.println(stringBuilder);
         writeToTxtFile(stringBuilder);
     }
 
-    private StringBuilder generateScript(String tableName,String MENU_ID,String BUSI_CODE,String CON_ID) throws IOException {
+    private StringBuilder generateScript(String tableName, String BUSI_CODE, String CON_ID) throws IOException {
         String whereStr = " WHERE MENU_ID=" + MENU_ID;
-        if(CommonUtil.isNotNullOrEmpty(BUSI_CODE)){
+        if (CommonUtil.isNotNullOrEmpty(BUSI_CODE)) {
             whereStr = " WHERE BUSI_CODE='" + BUSI_CODE + "'";
         }
-        if(CommonUtil.isNotNullOrEmpty(CON_ID)){
+        if (CommonUtil.isNotNullOrEmpty(CON_ID)) {
             whereStr = " WHERE CON_ID=" + CON_ID;
         }
         List<Map<String, Object>> dataList = jdbcTemplate.queryForList("SELECT * FROM " + tableName + whereStr);
@@ -114,7 +89,7 @@ public class MyService implements IService {
                     }
                     if ("int".equals(columnType) || "numeric".equals(columnType)) { // 整型及数字型的值拼接时不加字符串
                         valueSb.append(map.get(columnName)).append(",");
-                    } else if("datetime".equals(columnType)){
+                    } else if ("datetime".equals(columnType)) {
                         valueSb.append("GETDATE(),");
                     } else {
                         valueSb.append("'").append(map.get(columnName)).append("',");
@@ -128,8 +103,9 @@ public class MyService implements IService {
         }
         return new StringBuilder();
     }
-    private void writeToTxtFile(StringBuilder sb) throws IOException {
-        String filenameTemp = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath()+File.separator+"script.txt";
+
+    public void writeToTxtFile(StringBuilder sb) throws IOException {
+        String filenameTemp = "D:\\script.txt";
         File filename = new File(filenameTemp);
         if (!filename.exists()) {
             filename.createNewFile();
