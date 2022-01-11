@@ -23,6 +23,12 @@ scheduled:
 #    username: root
 #    password: root
 #    driver: com.mysql.jdbc.Driver
+#spring:
+#  datasource:
+#    url: jdbc:sqlserver://10.202.85.78:1433;DatabaseName=YGT
+#    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#    username: sa
+#    password: SZkingdom898@
 spring:
   datasource:
     url: jdbc:sqlserver://10.202.85.78:1433;DatabaseName=YGT

@@ -36,7 +36,8 @@ public class MyController {
     }
 
     @GetMapping(path = "/generateScript/{MENU_ID}")
-    public void publishEvent(@PathVariable("MENU_ID") String MENU_ID) throws Exception {
+    public String generateScript(@PathVariable("MENU_ID") String MENU_ID) throws Exception {
         service.generateSqlScript(MENU_ID);
+        return "升级脚本已在桌面生成！";
     }
 }
