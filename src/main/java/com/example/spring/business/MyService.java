@@ -77,8 +77,8 @@ public class MyService implements IService {
         String MENU_NAME = CommonUtil.nonNullStr(menuInfo.get("MENU_NAME"));
         messages.put("UPM_MENU","-- 新增【XX】菜单");
         messages.put("OPP_BUSI_DEF","-- 新增【XX】菜单业务基本设置");
-        messages.put("OPP_BUSI_ACS_CFG","-- 业务【XX】新增条件ID为【CON_ID】的业务准入");
-        messages.put("OPP_PROC_POST_CFG","-- 新增【XX】菜单 业务流程模板设置");
+        messages.put("OPP_BUSI_ACS_CFG","-- 业务【XX】新增业务准入配置");
+        messages.put("OPP_PROC_POST_CFG","-- 新增【XX】菜单业务流程模板设置");
         messages.put("OPP_BUSI_TRANS_CONF","-- 新增【XX】菜单业务任务配置");
         messages.put("OPP_BUSI_REVIEW_NODE","-- 新增【XX】菜单业务审核模块配置");
         messages.put("OPP_BUSI_ACS_COND","-- 新增【XX】的准入条件【CON_ID-CON_NAME】");
@@ -116,7 +116,12 @@ public class MyService implements IService {
         }
         List<Map<String, Object>> dataList = jdbcTemplate.queryForList("SELECT * FROM " + tableName + whereStr);
         if (CommonUtil.isNotNullOrEmpty(dataList)) {
-            StringBuilder sb = new StringBuilder("DELETE FROM ").append(tableName).append(whereStr).append(";\n");
+            String message = messages.get(tableName).replace("XX", MENU_NAME);
+            if(CommonUtil.isNotNullOrEmpty(dataList.get(0).get("CON_ID"))){
+                message = message.replace("CON_ID",CommonUtil.nonNullStr(dataList.get(0).get("CON_ID"))).replace("CON_NAME", CommonUtil.nonNullStr(dataList.get(0).get("CON_NAME")));
+            }
+            StringBuilder sb = new StringBuilder(message);
+            sb.append("\nDELETE FROM ").append(tableName).append(whereStr).append(";\n");
             List<Map<String, Object>> columnList = new ArrayList<>();
             if(isSqlServer()){
                 columnList = jdbcTemplate.queryForList("SELECT ColumnName = Columns.name ,ColumnType = Types.name FROM sys.tables AS Tables INNER JOIN sys.columns AS Columns ON Tables.object_id = Columns.object_id INNER JOIN sys.types AS Types ON Columns.system_type_id = Types.system_type_id AND is_user_defined = 0 AND Types.name <> 'sysname' WHERE Tables.name = '" + tableName + "' ORDER BY Columns.column_id");
