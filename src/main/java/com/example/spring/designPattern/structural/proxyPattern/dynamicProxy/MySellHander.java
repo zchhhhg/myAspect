@@ -1,4 +1,4 @@
-package com.example.spring.proxy;
+package com.example.spring.designPattern.structural.proxyPattern.dynamicProxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

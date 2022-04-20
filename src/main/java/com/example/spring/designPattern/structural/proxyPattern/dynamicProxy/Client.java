@@ -1,14 +1,15 @@
-package com.example.spring.proxy;
+package com.example.spring.designPattern.structural.proxyPattern.dynamicProxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
 /**
  * @author zhoucheng
- * @description
+ * @description JDK动态代理 目标对象需要实现接口
+ * cglib代理 目标对象不需要实现接口 底层是通过字节码处理框架ASM来转换字节码并生成新的类
  * @date 2022-01-10-17:35
  */
-public class MainShop {
+public class Client {
     public static void main(String[] args) {
         // 1、创建目标对象，使用Proxy
         UsbSell factory = new UsbKingFactory();
